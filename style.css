@@ -21,6 +21,7 @@ body {
 
 .flex {
   display: flex;
+  z-index: 100;
 }
 
 input,
@@ -59,9 +60,9 @@ input[type="text"] {
   border-radius: 10px 10px 0 0;
   padding: 15px 20px;
   position: absolute;
-  top: -50px;
+  top: 85px;
   transition: transform 0.5s ease;
-  display: hidden;
+  visibility: hidden;
 }
 
 .notification-container p {
@@ -69,12 +70,56 @@ input[type="text"] {
 }
 
 .notification-container.show {
-  transform: translateY(50px);
+  visibility: visible;
+  transform: translateY(40px);
+}
+
+.meals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+  margin-top: 20px;
+}
+
+.meal {
+  cursor: pointer;
+  position: relative;
+  height: 180px;
+  width: 180px;
+  text-align: center;
+}
+
+.meal img {
+  width: 100%;
+  height: 100%;
+  border: 4px #fff solid;
+  border-radius: 2px;
+}
+
+.meal-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease-in;
+  opacity: 0;
+}
+
+.meal:hover .meal-info {
+  opacity: 1;
 }
 
 @media (max-width: 800px) {
 }
 @media (max-width: 700px) {
+  .meals {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 @media (max-width: 500px) {
   input[type="text"] {
