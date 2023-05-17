@@ -1,14 +1,22 @@
-const search = document.getElementById("search");
-const submit = document.getElementById("submit");
-const random = document.getElementById("random");
-const mealsEl = document.getElementById("meals");
-const resultHeading = document.getElementById("result-heading");
-const single_mealEl = document.getElementById("single-meal");
-const notification = document.getElementById("notification-container");
+const search = document.getElementById("search"),
+  submit = document.getElementById("submit"),
+  random = document.getElementById("random"),
+  mealsEl = document.getElementById("meals"),
+  resultHeading = document.getElementById("result-heading"),
+  single_mealEl = document.getElementById("single-meal");
+notification = document.getElementById("notification-container");
 
-// Search the meal and fetch from API
-function searchMeal(event) {
-  event.preventDefault();
+// Show notification for empty search
+function showNotification() {
+  notification.classList.add("show");
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 2000);
+}
+
+// Search meal and fetch from API
+function searchMeal(e) {
+  e.preventDefault();
 
   // Clear single meal
   single_mealEl.innerHTML = "";
@@ -45,20 +53,27 @@ function searchMeal(event) {
     search.value = "";
   } else {
     showNotification();
-    console.log("clicked");
   }
 }
 
-function showNotification() {
-  notification.classList.add("show");
-  setTimeout(() => {
-    notification.classList.remove("show");
-  }, 2000);
+// Fetch meal by ID
+function getMealById(mealID) {
+  fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const meal = data.meals[0];
+
+      addMealToDOM(meal);
+    });
 }
 
-// Fetch meal by ID
-function ge(mealID) {
-  fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`)
+// Fetch random meal from API
+function getRandomMeal() {
+  // Clear meals and heading
+  mealsEl.innerHTML = "";
+  resultHeading.innerHTML = "";
+
+  fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
     .then((res) => res.json())
     .then((data) => {
       const meal = data.meals[0];
@@ -72,9 +87,9 @@ function addMealToDOM(meal) {
   const ingredients = [];
 
   for (let i = 1; i <= 20; i++) {
-    if (meal[`strIngredients{i}`]) {
+    if (meal[`strIngredient${i}`]) {
       ingredients.push(
-        `${meal[`strIngredient${i}`]} - ${meal[`strMeasures{i}`]}`
+        `${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}`
       );
     } else {
       break;
@@ -82,19 +97,19 @@ function addMealToDOM(meal) {
   }
 
   single_mealEl.innerHTML = `
-    <div class='single-meal'>
+    <div class="single-meal">
       <h1>${meal.strMeal}</h1>
-      <img src='${meal.strMealThumb}' alt='${meal.strMeal}'>
-      <div class='single-meal-info'>
-         ${meal.strCategory ? `<p>${meal.strCategory}</p>` : ""}
-         ${meal.strArea ? `<p>${meal.strArea}</p>` : ""}
+      <img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
+      <div class="single-meal-info">
+        ${meal.strCategory ? `<p>${meal.strCategory}</p>` : ""}
+        ${meal.strArea ? `<p>${meal.strArea}</p>` : ""}
       </div>
-      <div class='main'>
-       <p>${meal.strInstructions}</p>
-       <h2>Ingredients</h2>
-       <ul>
-         ${ingredients.map((ing) => `<li>${ing}</li>`).join("")}
-       </ul>
+      <div class="main">
+        <p>${meal.strInstructions}</p>
+        <h2>Ingredients</h2>
+        <ul>
+          ${ingredients.map((ing) => `<li>${ing}</li>`).join("")}
+        </ul>
       </div>
     </div>
   `;
@@ -102,9 +117,10 @@ function addMealToDOM(meal) {
 
 // Event listeners
 submit.addEventListener("submit", searchMeal);
+random.addEventListener("click", getRandomMeal);
 
-mealsEl.addEventListener("click", (e) => {
-  const mealInfo = e.path.find((item) => {
+mealsEl.addEventListener("click", (event) => {
+  const mealInfo = event.path.find((item) => {
     if (item.classList) {
       return item.classList.contains("meal-info");
     } else {
